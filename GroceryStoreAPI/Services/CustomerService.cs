@@ -19,5 +19,10 @@ namespace GroceryStoreAPI.Services
         {
             return _context.Customers.ToList<Customer>();
         }
+
+        public Customer GetCustomer(int id)
+        {
+            return _context.Customers.FirstOrDefault(i => i.Id == id);
+        }
     }
 }

@@ -28,5 +28,18 @@ namespace GroceryStoreAPI.Controllers
             
             return Ok(customers);
         }
+
+        [HttpGet("{id:int}", Name = "GetCustomerById")]
+        public ActionResult GetCustomerById(int id)
+        {
+            var customer = _customerService.GetCustomer(id);
+
+            if (customer == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(customer);
+        }
     }
 }
