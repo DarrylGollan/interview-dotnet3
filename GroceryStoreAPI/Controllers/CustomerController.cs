@@ -3,6 +3,7 @@ using GroceryStoreAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GroceryStoreAPI.Controllers
 {
@@ -12,34 +13,83 @@ namespace GroceryStoreAPI.Controllers
 
         public CustomerController(ICustomerService customerService)
         {
-            _customerService = customerService ?? 
+            _customerService = customerService ??
                 throw new ArgumentNullException(nameof(customerService));
         }
-        
-        [HttpGet(Name = "GetCustomers")]
-        public ActionResult<IEnumerable<Customer>> GetCustomers()
-        {
-            var customers = _customerService.GetCustomers();
 
-            if(customers == null)
+        [HttpGet(Name = "GetCustomers")]
+        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
+        {
+            try
             {
-                return NotFound();
+                var customers = await _customerService.GetCustomers();
+
+                if (customers == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(customers);
             }
-            
-            return Ok(customers);
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
         }
 
         [HttpGet("{id:int}", Name = "GetCustomerById")]
-        public ActionResult GetCustomerById(int id)
+        public async Task<ActionResult> GetCustomerById(int? id)
         {
-            var customer = _customerService.GetCustomer(id);
-
-            if (customer == null)
+            if(id == null || id < 1)
             {
-                return NotFound();
+                return BadRequest();
+            }
+            
+            try
+            {
+                var customer = await _customerService.GetCustomer(id.Value);
+
+                if (customer == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(customer);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
             }
 
-            return Ok(customer);
+        }
+
+        [HttpPost(Name = "CreateCustomer")]
+        public async Task<ActionResult<Customer>> CreateCustomer(Customer customer)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var customerId = await _customerService.AddCustomer(customer);
+                    if (customerId > 0)
+                    {
+                        return CreatedAtRoute("CreateCustomer",
+                            new { Id = customerId },
+                            customer);
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest();
+                }
+
+            }
+
+            return BadRequest();
         }
     }
 }

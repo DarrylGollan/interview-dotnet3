@@ -1,8 +1,10 @@
 ﻿using GroceryStoreAPI.DbContexts;
 using GroceryStoreAPI.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace GroceryStoreAPI.Services
 {
@@ -15,14 +17,39 @@ namespace GroceryStoreAPI.Services
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public IEnumerable<Customer> GetCustomers()
+        public async Task<IEnumerable<Customer>> GetCustomers()
         {
-            return _context.Customers.ToList<Customer>();
+            return await _context.Customers.ToListAsync<Customer>();
         }
 
-        public Customer GetCustomer(int id)
+        public async Task<Customer> GetCustomer(int id)
         {
-            return _context.Customers.FirstOrDefault(i => i.Id == id);
+            return await _context.Customers.FirstOrDefaultAsync(i => i.Id == id);
+        }
+
+        public async Task<int> AddCustomer(Customer customer)
+        {
+            if (customer == null)
+            {
+                throw new ArgumentNullException(nameof(customer));
+            }
+
+            //customer.CreatedDate = DateTimeOffset.Now;
+
+            await _context.Customers.AddAsync(customer);
+            await _context.SaveChangesAsync();
+
+            return customer.Id;
+        }
+
+        //public void UpdateList(DoList list)
+        //{
+        //    list.UpdatedDate = DateTimeOffset.Now;
+        //}
+
+        public async Task<bool> Save()
+        {
+            return (await _context.SaveChangesAsync() >= 0);
         }
     }
 }
