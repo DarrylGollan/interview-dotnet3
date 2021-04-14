@@ -3,6 +3,7 @@ using GroceryStoreAPI.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -15,12 +16,13 @@ namespace GroceryStoreAPI.CustomerTests
     public class CustomerTests : IClassFixture<WebApplicationFactory<GroceryStoreAPI.Startup>>
     {
         private readonly HttpClient _client;
-        private readonly string _baseURL;
+        private readonly string _url;
 
         public CustomerTests(WebApplicationFactory<GroceryStoreAPI.Startup> fixture)
         {
             _client = fixture.CreateClient();
-            _baseURL = "https://localhost:5001/api/customer";
+            _client.BaseAddress = new Uri("https://localhost:5001");
+            _url = "/api/customer/";
         }
 
         #region Get All Customers Tests (/api/customer)
@@ -29,7 +31,7 @@ namespace GroceryStoreAPI.CustomerTests
         public async Task Get_WhenCalled_ReturnsAllCustomers()
         {
             // Act
-            var response = await _client.GetAsync(_baseURL);
+            var response = await _client.GetAsync(_url);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -46,10 +48,10 @@ namespace GroceryStoreAPI.CustomerTests
         public async Task GetCustomerById_UnknownIdPassed_ReturnsNotFoundResult()
         {
             // Arrange
-            var url = "/99";
+            var customerId = 99;
 
             // Act
-            var response = await _client.GetAsync(_baseURL + url);
+            var response = await _client.GetAsync(_url + customerId);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -59,10 +61,10 @@ namespace GroceryStoreAPI.CustomerTests
         public async Task GetCustomerById_ExistingIdPassed_ReturnsOkResult()
         {
             // Arrange
-            var url = "/1";
+            var customerId = 1;
 
             // Act
-            var response = await _client.GetAsync(_baseURL + url);
+            var response = await _client.GetAsync(_url + customerId);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -72,11 +74,10 @@ namespace GroceryStoreAPI.CustomerTests
         public async Task GetCustomerById_0IdPassed_ReturnsBadRequestResult()
         {
             // Arrange
-            var url = "/";
-            int customerId = 0;
+            var customerId = 0;
 
             // Act
-            var response = await _client.GetAsync(_baseURL + url + customerId);
+            var response = await _client.GetAsync(_url + customerId);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -86,11 +87,10 @@ namespace GroceryStoreAPI.CustomerTests
         public async Task GetCustomerById_ExistingIdPassed_ReturnsCorrectItem()
         {
             // Arrange
-            var url = "/";
-            int customerId = 1;
+            var customerId = 1;
 
             // Act
-            var response = await _client.GetAsync(_baseURL + url + customerId);
+            var response = await _client.GetAsync(_url + customerId);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -115,7 +115,7 @@ namespace GroceryStoreAPI.CustomerTests
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
             // Act
-            var response = await _client.PostAsync(_baseURL, payload);
+            var response = await _client.PostAsync(_url, payload);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -133,7 +133,7 @@ namespace GroceryStoreAPI.CustomerTests
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
             // Act
-            var response = await _client.PostAsync(_baseURL, payload);
+            var response = await _client.PostAsync(_url, payload);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -151,7 +151,7 @@ namespace GroceryStoreAPI.CustomerTests
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
             // Act
-            var response = await _client.PostAsync(_baseURL, payload);
+            var response = await _client.PostAsync(_url, payload);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -169,7 +169,7 @@ namespace GroceryStoreAPI.CustomerTests
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
             // Act
-            var response = await _client.PostAsync(_baseURL, payload);
+            var response = await _client.PostAsync(_url, payload);
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -189,7 +189,7 @@ namespace GroceryStoreAPI.CustomerTests
             var customerId = 2;
 
             // Act
-            var getExistingCustomerResponse = await _client.GetAsync(_baseURL + "/" + customerId);
+            var getExistingCustomerResponse = await _client.GetAsync(_url + customerId);
             getExistingCustomerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
             var exisingCustomer = JsonConvert.DeserializeObject<Customer>(await getExistingCustomerResponse.Content.ReadAsStringAsync());
             
@@ -199,7 +199,7 @@ namespace GroceryStoreAPI.CustomerTests
             var json = JsonConvert.SerializeObject(exisingCustomer);
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var updateCustomerResponse = await _client.PutAsync(_baseURL + "/" + exisingCustomer.Id, payload);
+            var updateCustomerResponse = await _client.PutAsync(_url + exisingCustomer.Id, payload);
 
             // Assert
             updateCustomerResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
@@ -212,7 +212,7 @@ namespace GroceryStoreAPI.CustomerTests
             var customerId = 2;
 
             // Act
-            var getExistingCustomerResponse = await _client.GetAsync(_baseURL + "/" + customerId);
+            var getExistingCustomerResponse = await _client.GetAsync(_url + customerId);
             getExistingCustomerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
             var exisingCustomer = JsonConvert.DeserializeObject<Customer>(await getExistingCustomerResponse.Content.ReadAsStringAsync());
             
@@ -222,7 +222,7 @@ namespace GroceryStoreAPI.CustomerTests
             var json = JsonConvert.SerializeObject(exisingCustomer);
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var updateCustomerResponse = await _client.PutAsync(_baseURL + "/" + exisingCustomer.Id, payload);
+            var updateCustomerResponse = await _client.PutAsync(_url + exisingCustomer.Id, payload);
 
             // Assert
             updateCustomerResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -235,7 +235,7 @@ namespace GroceryStoreAPI.CustomerTests
             var customerId = 2;
 
             // Act
-            var getExistingCustomerResponse = await _client.GetAsync(_baseURL + "/" + customerId);
+            var getExistingCustomerResponse = await _client.GetAsync(_url + customerId);
             getExistingCustomerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
             var exisingCustomer = JsonConvert.DeserializeObject<Customer>(await getExistingCustomerResponse.Content.ReadAsStringAsync());
             
@@ -246,12 +246,43 @@ namespace GroceryStoreAPI.CustomerTests
             var json = JsonConvert.SerializeObject(exisingCustomer);
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var updateCustomerResponse = await _client.PutAsync(_baseURL + "/" + exisingCustomer.Id, payload);
+            var updateCustomerResponse = await _client.PutAsync(_url + exisingCustomer.Id, payload);
 
             // Assert
             updateCustomerResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         #endregion
+
+        #region Delete Existing Customer
+
+        [Fact]
+        public async Task Delete_Customer_ValidCustomerId_Return_OkResult()
+        {
+            //Arrange  
+            var customerId = 3;
+
+            //Act  
+            var response = await _client.DeleteAsync(_url + customerId);
+
+            //Assert  
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        }
+
+        [Fact]
+        public async Task Delete_Customer_InvalidCustomerId_Return_NotFoundResult()
+        {
+            //Arrange  
+            var customerId = 99;
+
+            //Act  
+            var response = await _client.DeleteAsync(_url + customerId);
+
+            //Assert  
+            response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        }
+
     }
+
+        #endregion
 }
