@@ -47,7 +47,7 @@ namespace GroceryStoreAPI.CustomerTests
         {
             // Arrange
             var url = "/99";
-            
+
             // Act
             var response = await _client.GetAsync(_baseURL + url);
 
@@ -69,7 +69,7 @@ namespace GroceryStoreAPI.CustomerTests
         }
 
         [Fact]
-        public async Task GetCustomerById_NullIdPassed_ReturnsBadRequestResult()
+        public async Task GetCustomerById_0IdPassed_ReturnsBadRequestResult()
         {
             // Arrange
             var url = "/";
@@ -152,12 +152,86 @@ namespace GroceryStoreAPI.CustomerTests
 
             // Act
             var response = await _client.PostAsync(_baseURL, payload);
-            
+
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.Created);
 
             var customer = JsonConvert.DeserializeObject<Customer>(await response.Content.ReadAsStringAsync());
             Assert.Equal(newCustomer.Name, customer.Name);
+        }
+
+        #endregion
+
+        #region Update Exising Customer Tests
+
+        [Fact]
+        public async Task UpdateCustomer_ValidData_Returns_NoContentResult()
+        {
+            // Arrange
+            var customerId = 2;
+
+            // Act
+            var getExistingCustomerResponse = await _client.GetAsync(_baseURL + "/" + customerId);
+            getExistingCustomerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            var exisingCustomer = JsonConvert.DeserializeObject<Customer>(await getExistingCustomerResponse.Content.ReadAsStringAsync());
+            
+            // Update customer name
+            exisingCustomer.Name = "Sandy";
+
+            var json = JsonConvert.SerializeObject(exisingCustomer);
+            var payload = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var updateCustomerResponse = await _client.PutAsync(_baseURL + "/" + exisingCustomer.Id, payload);
+
+            // Assert
+            updateCustomerResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        }
+
+        [Fact]
+        public async Task UpdateCustomer_InvalidData_Return_BadRequest()
+        {
+            // Arrange
+            var customerId = 2;
+
+            // Act
+            var getExistingCustomerResponse = await _client.GetAsync(_baseURL + "/" + customerId);
+            getExistingCustomerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            var exisingCustomer = JsonConvert.DeserializeObject<Customer>(await getExistingCustomerResponse.Content.ReadAsStringAsync());
+            
+            // Update customer name to exceed the maximum length of 20 characters
+            exisingCustomer.Name = "Name exceeds the maximum length of 20 characters";
+
+            var json = JsonConvert.SerializeObject(exisingCustomer);
+            var payload = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var updateCustomerResponse = await _client.PutAsync(_baseURL + "/" + exisingCustomer.Id, payload);
+
+            // Assert
+            updateCustomerResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
+        public async Task Task_Update_InvalidData_Return_NotFound()
+        {
+            // Arrange
+            var customerId = 2;
+
+            // Act
+            var getExistingCustomerResponse = await _client.GetAsync(_baseURL + "/" + customerId);
+            getExistingCustomerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            var exisingCustomer = JsonConvert.DeserializeObject<Customer>(await getExistingCustomerResponse.Content.ReadAsStringAsync());
+            
+            // Update customer
+            exisingCustomer.Id = 99;
+            exisingCustomer.Name = "Sandy";
+
+            var json = JsonConvert.SerializeObject(exisingCustomer);
+            var payload = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var updateCustomerResponse = await _client.PutAsync(_baseURL + "/" + exisingCustomer.Id, payload);
+
+            // Assert
+            updateCustomerResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         #endregion
