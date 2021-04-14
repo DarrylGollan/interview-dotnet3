@@ -53,6 +53,17 @@ namespace GroceryStoreAPI.Services
             await _context.SaveChangesAsync();
         }
 
+        public async Task DeleteCustomer(int customerId)
+        {
+            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Id == customerId);
+
+            if(customer != null)
+            {
+                _context.Entry(customer).State = EntityState.Deleted;
+                await _context.SaveChangesAsync();
+            }
+        }
+
         public async Task<bool> CustomerExists(int customerId)
         {
             if(customerId < 1)

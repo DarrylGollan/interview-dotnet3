@@ -38,13 +38,13 @@ namespace GroceryStoreAPI.Controllers
         }
 
         [HttpGet("{id:int}", Name = "GetCustomerById")]
-        public async Task<ActionResult> GetCustomerById(int? id)
+        public async Task<ActionResult<Customer>> GetCustomerById(int? id)
         {
-            if(id == null || id < 1)
+            if (id == null || id.Value < 1)
             {
                 return BadRequest();
             }
-            
+
             try
             {
                 var customer = await _customerService.GetCustomer(id.Value);
@@ -95,11 +95,11 @@ namespace GroceryStoreAPI.Controllers
         [HttpPut("{customerId:int}", Name = "UpdateCustomer")]
         public async Task<IActionResult> UpdateCustomer(int customerId, Customer updatedCustomer)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
-                    if(!await _customerService.CustomerExists(customerId))
+                    if (!await _customerService.CustomerExists(customerId))
                     {
                         return NotFound();
                     }
@@ -109,13 +109,40 @@ namespace GroceryStoreAPI.Controllers
 
                     return NoContent();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     return BadRequest();
                 }
             }
 
             return BadRequest();
+        }
+
+        [HttpDelete("{customerId:int}", Name = "DeleteCustomer")]
+        public async Task<IActionResult> DeleteCustomer(int customerId)
+        {
+            try
+            {
+                if (customerId > 0)
+                {
+                    if (!await _customerService.CustomerExists(customerId))
+                    {
+                        return NotFound();
+                    }
+
+                    await _customerService.DeleteCustomer(customerId);
+
+                    return NoContent();
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
         }
     }
 }

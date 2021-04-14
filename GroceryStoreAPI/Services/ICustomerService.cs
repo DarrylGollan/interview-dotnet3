@@ -10,6 +10,7 @@ namespace GroceryStoreAPI.Services
         Task<Customer> GetCustomer(int id);
         Task<int> AddCustomer(Customer customer);
         Task UpdateCustomer(Customer customer);
+        Task DeleteCustomer(int customerId);
         Task<bool> CustomerExists(int customerId);
         Task<bool> Save();
     }
