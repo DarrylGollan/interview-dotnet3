@@ -9,7 +9,8 @@ namespace GroceryStoreAPI.Services
         Task<IEnumerable<Customer>> GetCustomers();
         Task<Customer> GetCustomer(int id);
         Task<int> AddCustomer(Customer customer);
-
+        Task UpdateCustomer(Customer customer);
+        Task<bool> CustomerExists(int customerId);
         Task<bool> Save();
     }
 }

@@ -42,10 +42,26 @@ namespace GroceryStoreAPI.Services
             return customer.Id;
         }
 
-        //public void UpdateList(DoList list)
-        //{
-        //    list.UpdatedDate = DateTimeOffset.Now;
-        //}
+        public async Task UpdateCustomer(Customer customer)
+        {
+            if (customer == null)
+            {
+                throw new ArgumentNullException(nameof(customer));
+            }
+
+            _context.Customers.Update(customer);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> CustomerExists(int customerId)
+        {
+            if(customerId < 1)
+            {
+                throw new ArgumentNullException(nameof(customerId));
+            }
+
+            return await _context.Customers.AnyAsync(c => c.Id == customerId);
+        }
 
         public async Task<bool> Save()
         {

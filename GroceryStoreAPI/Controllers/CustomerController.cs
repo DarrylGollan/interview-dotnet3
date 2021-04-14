@@ -91,5 +91,31 @@ namespace GroceryStoreAPI.Controllers
 
             return BadRequest();
         }
+
+        [HttpPut("{customerId:int}", Name = "UpdateCustomer")]
+        public async Task<IActionResult> UpdateCustomer(int customerId, Customer updatedCustomer)
+        {
+            if(ModelState.IsValid)
+            {
+                try
+                {
+                    if(!await _customerService.CustomerExists(customerId))
+                    {
+                        return NotFound();
+                    }
+
+                    updatedCustomer.Id = customerId;
+                    await _customerService.UpdateCustomer(updatedCustomer);
+
+                    return NoContent();
+                }
+                catch(Exception ex)
+                {
+                    return BadRequest();
+                }
+            }
+
+            return BadRequest();
+        }
     }
 }

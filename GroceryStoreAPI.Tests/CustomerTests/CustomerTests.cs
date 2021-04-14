@@ -122,6 +122,24 @@ namespace GroceryStoreAPI.CustomerTests
         }
 
         [Fact]
+        public async Task AddCustomer_InvalidObjectPassed_NameExceedsMaximumLength_ReturnsBadRequest()
+        {
+            // Arrange
+            var newCustomer = new Customer()
+            {
+                Name = "Name exceeds the maximum number of characters allowed"
+            };
+            var json = JsonConvert.SerializeObject(newCustomer);
+            var payload = new StringContent(json, Encoding.UTF8, "application/json");
+
+            // Act
+            var response = await _client.PostAsync(_baseURL, payload);
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        }
+
+        [Fact]
         public async Task AddCustomer_ValidObjectPassed_ReturnsCreatedResponse()
         {
             // Arrange
