@@ -1,10 +1,11 @@
 ﻿using FluentAssertions;
 using GroceryStoreAPI.Entities;
-using Microsoft.AspNetCore.Mvc;
+using GroceryStoreAPI.Extensions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -13,6 +14,8 @@ using Xunit;
 
 namespace GroceryStoreAPI.CustomerTests
 {
+    [CollectionDefinition("Non-Parallel Collection", DisableParallelization = true)]
+    [Collection("Sequential")]
     public class CustomerTests : IClassFixture<WebApplicationFactory<GroceryStoreAPI.Startup>>
     {
         private readonly HttpClient _client;
@@ -36,7 +39,9 @@ namespace GroceryStoreAPI.CustomerTests
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var customers = JsonConvert.DeserializeObject<List<Customer>>(await response.Content.ReadAsStringAsync());
+            var stream = await response.Content.ReadAsStreamAsync();
+            IEnumerable<Customer> customers = stream.ReadAndDeserializeFromJson<IEnumerable<Customer>>();
+
             customers.Should().HaveCount(3);
         }
 
@@ -94,7 +99,10 @@ namespace GroceryStoreAPI.CustomerTests
 
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-            var customer = JsonConvert.DeserializeObject<Customer>(await response.Content.ReadAsStringAsync());
+
+            var stream = await response.Content.ReadAsStreamAsync();
+            Customer customer = stream.ReadAndDeserializeFromJson<Customer>();
+            
             Assert.Equal(customerId, customer.Id);
             Assert.Equal("Bob", customer.Name);
         }
@@ -191,7 +199,9 @@ namespace GroceryStoreAPI.CustomerTests
             // Act
             var getExistingCustomerResponse = await _client.GetAsync(_url + customerId);
             getExistingCustomerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-            var exisingCustomer = JsonConvert.DeserializeObject<Customer>(await getExistingCustomerResponse.Content.ReadAsStringAsync());
+
+            var stream = await getExistingCustomerResponse.Content.ReadAsStreamAsync();
+            Customer exisingCustomer = stream.ReadAndDeserializeFromJson<Customer>();
             
             // Update customer name
             exisingCustomer.Name = "Sandy";
@@ -214,7 +224,9 @@ namespace GroceryStoreAPI.CustomerTests
             // Act
             var getExistingCustomerResponse = await _client.GetAsync(_url + customerId);
             getExistingCustomerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-            var exisingCustomer = JsonConvert.DeserializeObject<Customer>(await getExistingCustomerResponse.Content.ReadAsStringAsync());
+
+            var stream = await getExistingCustomerResponse.Content.ReadAsStreamAsync();
+            Customer exisingCustomer = stream.ReadAndDeserializeFromJson<Customer>();
             
             // Update customer name to exceed the maximum length of 20 characters
             exisingCustomer.Name = "Name exceeds the maximum length of 20 characters";
@@ -237,7 +249,9 @@ namespace GroceryStoreAPI.CustomerTests
             // Act
             var getExistingCustomerResponse = await _client.GetAsync(_url + customerId);
             getExistingCustomerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-            var exisingCustomer = JsonConvert.DeserializeObject<Customer>(await getExistingCustomerResponse.Content.ReadAsStringAsync());
+
+            var stream = await getExistingCustomerResponse.Content.ReadAsStreamAsync();
+            Customer exisingCustomer = stream.ReadAndDeserializeFromJson<Customer>();
             
             // Update customer
             exisingCustomer.Id = 99;
