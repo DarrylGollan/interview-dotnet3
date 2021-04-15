@@ -1,0 +1,54 @@
+{
+  "customers": [
+    {
+      "id": "82C98F0C-2093-4EF7-8BD4-A13E00C4D02E",
+      "name": "Darryl",
+      "age": "28",
+      "address": "449 Simcoe St., London ON N6L 1Z7",
+      "email": "darryl.gollan@gmail.com",
+      "phone": "226-268-4611",
+      "createdDate": "2021-04-15T09:00:00",
+      "updatedDate": ""
+    },
+    {
+      "id": "EF0C4D03-12B4-4677-8EED-801CE18FC883",
+      "name": "Michelle",
+      "age": "38",
+      "address": "433 Dufferin Ave., London ON N6L 1Z7",
+      "email": "michelle@gmail.com",
+      "phone": "226-268-6611",
+      "createdDate": "2021-04-15T09:00:00",
+      "updatedDate": ""
+    },
+    {
+      "id": "38D93D92-B202-41C1-A441-66E283D50F25",
+      "name": "Sandy",
+      "age": "64",
+      "address": "523 Brringer St., Belleville ON N6L 1Z7",
+      "email": "sandy@gmail.com",
+      "phone": "613-233-9811",
+      "createdDate": "2021-04-15T09:00:00",
+      "updatedDate": ""
+    },
+    {
+      "id": "641F530D-DD74-4D57-91A8-66FF7443669B",
+      "name": "Sandra",
+      "age": "44",
+      "address": "444 Oxford St West, London ON N6L 1Z7",
+      "email": "sandra@gmail.com",
+      "phone": "519-232-9877",
+      "createdDate": "2021-04-15T09:00:00",
+      "updatedDate": ""
+    },
+    {
+      "id": "286ABD03-F3D8-49D4-AEF3-35CF3A9D66D4",
+      "name": "Raichel",
+      "age": "54",
+      "address": "923 Oxford St West, London ON N6L 1Z7",
+      "email": "raichel@gmail.com",
+      "phone": "519-232-8823",
+      "createdDate": "2021-04-15T09:00:00",
+      "updatedDate": ""
+    }
+  ]
+}

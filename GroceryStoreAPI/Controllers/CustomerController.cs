@@ -37,17 +37,17 @@ namespace GroceryStoreAPI.Controllers
             }
         }
 
-        [HttpGet("{id:int}", Name = "GetCustomerById")]
-        public async Task<ActionResult<Customer>> GetCustomerById(int? id)
+        [HttpGet("{id:guid}", Name = "GetCustomerById")]
+        public async Task<ActionResult<Customer>> GetCustomerById(Guid id)
         {
-            if (id == null || id.Value < 1)
+            if (id == null || id == Guid.Empty)
             {
                 return BadRequest();
             }
 
             try
             {
-                var customer = await _customerService.GetCustomer(id.Value);
+                var customer = await _customerService.GetCustomer(id);
 
                 if (customer == null)
                 {
@@ -70,8 +70,13 @@ namespace GroceryStoreAPI.Controllers
             {
                 try
                 {
+                    if (customer.Id == null || customer.Id == Guid.Empty)
+                    {
+                        customer.Id = Guid.NewGuid();
+                    }
+
                     var customerId = await _customerService.AddCustomer(customer);
-                    if (customerId > 0)
+                    if (customerId != Guid.Empty)
                     {
                         return CreatedAtRoute("CreateCustomer",
                             new { Id = customerId },
@@ -92,8 +97,8 @@ namespace GroceryStoreAPI.Controllers
             return BadRequest();
         }
 
-        [HttpPut("{customerId:int}", Name = "UpdateCustomer")]
-        public async Task<IActionResult> UpdateCustomer(int customerId, Customer updatedCustomer)
+        [HttpPut("{customerId:guid}", Name = "UpdateCustomer")]
+        public async Task<IActionResult> UpdateCustomer(Guid customerId, Customer updatedCustomer)
         {
             if (ModelState.IsValid)
             {
@@ -118,12 +123,12 @@ namespace GroceryStoreAPI.Controllers
             return BadRequest();
         }
 
-        [HttpDelete("{customerId:int}", Name = "DeleteCustomer")]
-        public async Task<IActionResult> DeleteCustomer(int customerId)
+        [HttpDelete("{customerId:guid}", Name = "DeleteCustomer")]
+        public async Task<IActionResult> DeleteCustomer(Guid customerId)
         {
             try
             {
-                if (customerId > 0)
+                if (customerId != Guid.Empty)
                 {
                     if (!await _customerService.CustomerExists(customerId))
                     {

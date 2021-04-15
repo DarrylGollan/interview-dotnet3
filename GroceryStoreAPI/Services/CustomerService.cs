@@ -3,7 +3,6 @@ using GroceryStoreAPI.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace GroceryStoreAPI.Services
@@ -22,12 +21,12 @@ namespace GroceryStoreAPI.Services
             return await _context.Customers.ToListAsync<Customer>();
         }
 
-        public async Task<Customer> GetCustomer(int id)
+        public async Task<Customer> GetCustomer(Guid id)
         {
             return await _context.Customers.FirstOrDefaultAsync(i => i.Id == id);
         }
 
-        public async Task<int> AddCustomer(Customer customer)
+        public async Task<Guid> AddCustomer(Customer customer)
         {
             if (customer == null)
             {
@@ -53,20 +52,20 @@ namespace GroceryStoreAPI.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteCustomer(int customerId)
+        public async Task DeleteCustomer(Guid customerId)
         {
             var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Id == customerId);
 
-            if(customer != null)
+            if (customer != null)
             {
                 _context.Entry(customer).State = EntityState.Deleted;
                 await _context.SaveChangesAsync();
             }
         }
 
-        public async Task<bool> CustomerExists(int customerId)
+        public async Task<bool> CustomerExists(Guid customerId)
         {
-            if(customerId < 1)
+            if (customerId == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(customerId));
             }
