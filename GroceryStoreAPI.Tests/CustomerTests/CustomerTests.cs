@@ -287,7 +287,7 @@ namespace GroceryStoreAPI.CustomerTests
         public async Task Test12_UpdateCustomer_InvalidNameProperty_Return_BadRequest()
         {
             // Arrange
-            var customerId = Guid.Parse("9095778F-055B-4115-8D83-661864F620D9");
+            var customerId = Guid.Parse("286ABD03-F3D8-49D4-AEF3-35CF3A9D66D4");
 
             // Act
             var getExistingCustomerResponse = await _client.GetAsync(_url + customerId);
@@ -312,7 +312,7 @@ namespace GroceryStoreAPI.CustomerTests
         public async Task Test13_UpdateCustomer_InvalidNamePropertyExceedsMaximumLength_Return_BadRequest()
         {
             // Arrange
-            var customerId = Guid.Parse("9095778F-055B-4115-8D83-661864F620D9");
+            var customerId = Guid.Parse("286ABD03-F3D8-49D4-AEF3-35CF3A9D66D4");
 
             // Act
             var getExistingCustomerResponse = await _client.GetAsync(_url + customerId);
@@ -337,7 +337,7 @@ namespace GroceryStoreAPI.CustomerTests
         public async Task Test14_UpdateCustomer_InvalidAgePropertyOutOfRange_Return_BadRequest()
         {
             // Arrange
-            var customerId = Guid.Parse("9095778F-055B-4115-8D83-661864F620D9");
+            var customerId = Guid.Parse("286ABD03-F3D8-49D4-AEF3-35CF3A9D66D4");
 
             // Act
             var getExistingCustomerResponse = await _client.GetAsync(_url + customerId);
@@ -362,7 +362,7 @@ namespace GroceryStoreAPI.CustomerTests
         public async Task Test15_UpdateCustomer_InvalidEmailProperty_Return_BadRequest()
         {
             // Arrange
-            var customerId = Guid.Parse("9095778F-055B-4115-8D83-661864F620D9");
+            var customerId = Guid.Parse("286ABD03-F3D8-49D4-AEF3-35CF3A9D66D4");
 
             // Act
             var getExistingCustomerResponse = await _client.GetAsync(_url + customerId);
@@ -387,7 +387,7 @@ namespace GroceryStoreAPI.CustomerTests
         public async Task Test16_UpdateCustomer_InvalidPhoneProperty_Return_BadRequest()
         {
             // Arrange
-            var customerId = Guid.Parse("9095778F-055B-4115-8D83-661864F620D9");
+            var customerId = Guid.Parse("286ABD03-F3D8-49D4-AEF3-35CF3A9D66D4");
 
             // Act
             var getExistingCustomerResponse = await _client.GetAsync(_url + customerId);
@@ -412,7 +412,7 @@ namespace GroceryStoreAPI.CustomerTests
         public async Task Test17_UpdateCustomer_ValidData_Returns_NoContentResult()
         {
             // Arrange
-            var customerId = Guid.Parse("9095778F-055B-4115-8D83-661864F620D9");
+            var customerId = Guid.Parse("286ABD03-F3D8-49D4-AEF3-35CF3A9D66D4");
 
             // Act
             var getExistingCustomerResponse = await _client.GetAsync(_url + customerId);
@@ -422,7 +422,7 @@ namespace GroceryStoreAPI.CustomerTests
             Customer exisingCustomer = stream.ReadAndDeserializeFromJson<Customer>();
 
             // Update customer name
-            exisingCustomer.Name = "Sandy";
+            exisingCustomer.Name = "Alexa";
 
             var json = JsonConvert.SerializeObject(exisingCustomer);
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
