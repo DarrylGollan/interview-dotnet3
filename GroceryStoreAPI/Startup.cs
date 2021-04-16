@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System;
 
 namespace GroceryStoreAPI
 {
@@ -21,6 +22,7 @@ namespace GroceryStoreAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddResponseCompression();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddApplicationServices(_config);
             services.AddControllers();
             services.AddSwaggerGen(c =>

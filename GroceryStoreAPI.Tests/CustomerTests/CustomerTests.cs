@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using GroceryStoreAPI.Entities;
 using GroceryStoreAPI.Extensions;
+using GroceryStoreAPI.Models;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Newtonsoft.Json;
 using System;
@@ -41,7 +42,7 @@ namespace GroceryStoreAPI.CustomerTests
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var stream = await response.Content.ReadAsStreamAsync();
-            IEnumerable<Customer> customers = stream.ReadAndDeserializeFromJson<IEnumerable<Customer>>();
+            var customers = stream.ReadAndDeserializeFromJson<IEnumerable<CustomerForDisplayDTO>>();
 
             customers.Should().HaveCount(5);
         }
@@ -102,7 +103,7 @@ namespace GroceryStoreAPI.CustomerTests
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var stream = await response.Content.ReadAsStreamAsync();
-            Customer customer = stream.ReadAndDeserializeFromJson<Customer>();
+            var customer = stream.ReadAndDeserializeFromJson<CustomerForDisplayDTO>();
 
             Assert.Equal(customerId, customer.Id);
             Assert.Equal("Michelle", customer.Name);
@@ -110,7 +111,6 @@ namespace GroceryStoreAPI.CustomerTests
             Assert.Equal("433 Dufferin Ave., London ON N6L 1Z7", customer.Address);
             Assert.Equal("michelle@gmail.com", customer.Email);
             Assert.Equal("226-268-6611", customer.Phone);
-            Assert.Equal(DateTimeOffset.Parse("2021-04-15T09:00:00"), customer.CreatedDate.Value);
         }
 
         #endregion
@@ -121,16 +121,14 @@ namespace GroceryStoreAPI.CustomerTests
         public async Task Test06_AddCustomer_InvalidObjectPassed_NamePropertyEmptyString_ReturnsBadRequest()
         {
             // Arrange
-            var newCustomer = new Customer()
+            var newCustomer = new CustomerForCreationDTO()
             {
                 Id = Guid.NewGuid(),
                 Name = "",
                 Age = 44,
                 Address = "Test Address",
                 Email = "test@gmail.com",
-                Phone = "519-345-1234",
-                CreatedDate = null,
-                UpdatedDate = null
+                Phone = "519-345-1234"
             };
             var json = JsonConvert.SerializeObject(newCustomer);
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
@@ -146,16 +144,14 @@ namespace GroceryStoreAPI.CustomerTests
         public async Task Test07_AddCustomer_InvalidObjectPassed_NameExceedsMaximumLength_ReturnsBadRequest()
         {
             // Arrange
-            var newCustomer = new Customer()
+            var newCustomer = new CustomerForCreationDTO()
             {
                 Id = Guid.NewGuid(),
                 Name = "Name property exceeds the maximum number of characters",
                 Age = 44,
                 Address = "Test Address",
                 Email = "test@gmail.com",
-                Phone = "519-345-1234",
-                CreatedDate = null,
-                UpdatedDate = null
+                Phone = "519-345-1234"
             };
             var json = JsonConvert.SerializeObject(newCustomer);
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
@@ -171,16 +167,14 @@ namespace GroceryStoreAPI.CustomerTests
         public async Task Test08_AddCustomer_InvalidObjectPassed_AgePropertyOutOfRange_ReturnsBadRequest()
         {
             // Arrange
-            var newCustomer = new Customer()
+            var newCustomer = new CustomerForCreationDTO()
             {
                 Id = Guid.NewGuid(),
                 Name = "Frank",
                 Age = 144,
                 Address = "Test Address",
                 Email = "test@gmail.com",
-                Phone = "519-345-1234",
-                CreatedDate = null,
-                UpdatedDate = null
+                Phone = "519-345-1234"
             };
             var json = JsonConvert.SerializeObject(newCustomer);
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
@@ -196,16 +190,14 @@ namespace GroceryStoreAPI.CustomerTests
         public async Task Test09_AddCustomer_InvalidObjectPassed_EmailPropertyNotValidEmail_ReturnsBadRequest()
         {
             // Arrange
-            var newCustomer = new Customer()
+            var newCustomer = new CustomerForCreationDTO()
             {
                 Id = Guid.NewGuid(),
                 Name = "Frank",
                 Age = 41,
                 Address = "Test Address",
                 Email = "testemail",
-                Phone = "519-345-1234",
-                CreatedDate = null,
-                UpdatedDate = null
+                Phone = "519-345-1234"
             };
             var json = JsonConvert.SerializeObject(newCustomer);
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
@@ -221,16 +213,14 @@ namespace GroceryStoreAPI.CustomerTests
         public async Task Test10_AddCustomer_InvalidObjectPassed_PhonePropertyNotValidPhone_ReturnsBadRequest()
         {
             // Arrange
-            var newCustomer = new Customer()
+            var newCustomer = new CustomerForCreationDTO()
             {
                 Id = Guid.NewGuid(),
                 Name = "Frank",
                 Age = 41,
                 Address = "Test Address",
                 Email = "test@gmail.com",
-                Phone = "abcd1234",
-                CreatedDate = null,
-                UpdatedDate = null
+                Phone = "abcd1234"
             };
             var json = JsonConvert.SerializeObject(newCustomer);
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
@@ -246,16 +236,14 @@ namespace GroceryStoreAPI.CustomerTests
         public async Task Test11_AddCustomer_ValidObjectPassed_ReturnsCreatedResponseAndCorrectCustomer()
         {
             // Arrange
-            var newCustomer = new Customer()
+            var newCustomer = new CustomerForCreationDTO()
             {
                 Id = Guid.Parse("9095778F-055B-4115-8D83-661864F620D9"),
                 Name = "Bill",
                 Age = 41,
                 Address = "Test Address",
                 Email = "test@gmail.com",
-                Phone = "519-334-9876",
-                CreatedDate = DateTimeOffset.UtcNow,
-                UpdatedDate = DateTimeOffset.UtcNow
+                Phone = "519-334-9876"
             };
             var json = JsonConvert.SerializeObject(newCustomer);
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
@@ -267,7 +255,7 @@ namespace GroceryStoreAPI.CustomerTests
             response.StatusCode.Should().Be(HttpStatusCode.Created);
 
             var stream = await response.Content.ReadAsStreamAsync();
-            Customer createdCustomer = stream.ReadAndDeserializeFromJson<Customer>();
+            var createdCustomer = stream.ReadAndDeserializeFromJson<CustomerForCreationDTO>();
 
             Assert.Equal(newCustomer.Id, createdCustomer.Id);
             Assert.Equal(newCustomer.Name, createdCustomer.Name);
@@ -275,8 +263,6 @@ namespace GroceryStoreAPI.CustomerTests
             Assert.Equal(newCustomer.Address, createdCustomer.Address);
             Assert.Equal(newCustomer.Email, createdCustomer.Email);
             Assert.Equal(newCustomer.Phone, createdCustomer.Phone);
-            Assert.Equal(newCustomer.CreatedDate, createdCustomer.CreatedDate);
-            Assert.Equal(newCustomer.UpdatedDate, createdCustomer.UpdatedDate);
         }
 
         #endregion
@@ -294,7 +280,7 @@ namespace GroceryStoreAPI.CustomerTests
             getExistingCustomerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var stream = await getExistingCustomerResponse.Content.ReadAsStreamAsync();
-            Customer exisingCustomer = stream.ReadAndDeserializeFromJson<Customer>();
+            var exisingCustomer = stream.ReadAndDeserializeFromJson<CustomerForUpdateDTO>();
 
             // Update customer name to empty string
             exisingCustomer.Name = string.Empty;
@@ -302,7 +288,7 @@ namespace GroceryStoreAPI.CustomerTests
             var json = JsonConvert.SerializeObject(exisingCustomer);
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var updateCustomerResponse = await _client.PutAsync(_url + exisingCustomer.Id, payload);
+            var updateCustomerResponse = await _client.PutAsync(_url + customerId, payload);
 
             // Assert
             updateCustomerResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -319,7 +305,7 @@ namespace GroceryStoreAPI.CustomerTests
             getExistingCustomerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var stream = await getExistingCustomerResponse.Content.ReadAsStreamAsync();
-            Customer exisingCustomer = stream.ReadAndDeserializeFromJson<Customer>();
+            var exisingCustomer = stream.ReadAndDeserializeFromJson<CustomerForUpdateDTO>();
 
             // Update customer name to exceed the maximum length of 20 characters
             exisingCustomer.Name = "Name exceeds the maximum length of 20 characters";
@@ -327,7 +313,7 @@ namespace GroceryStoreAPI.CustomerTests
             var json = JsonConvert.SerializeObject(exisingCustomer);
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var updateCustomerResponse = await _client.PutAsync(_url + exisingCustomer.Id, payload);
+            var updateCustomerResponse = await _client.PutAsync(_url + customerId, payload);
 
             // Assert
             updateCustomerResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -344,7 +330,7 @@ namespace GroceryStoreAPI.CustomerTests
             getExistingCustomerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var stream = await getExistingCustomerResponse.Content.ReadAsStreamAsync();
-            Customer exisingCustomer = stream.ReadAndDeserializeFromJson<Customer>();
+            var exisingCustomer = stream.ReadAndDeserializeFromJson<CustomerForUpdateDTO>();
 
             // Update customer age out of range
             exisingCustomer.Age = 101;
@@ -352,7 +338,7 @@ namespace GroceryStoreAPI.CustomerTests
             var json = JsonConvert.SerializeObject(exisingCustomer);
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var updateCustomerResponse = await _client.PutAsync(_url + exisingCustomer.Id, payload);
+            var updateCustomerResponse = await _client.PutAsync(_url + customerId, payload);
 
             // Assert
             updateCustomerResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -369,7 +355,7 @@ namespace GroceryStoreAPI.CustomerTests
             getExistingCustomerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var stream = await getExistingCustomerResponse.Content.ReadAsStreamAsync();
-            Customer exisingCustomer = stream.ReadAndDeserializeFromJson<Customer>();
+            var exisingCustomer = stream.ReadAndDeserializeFromJson<CustomerForUpdateDTO>();
 
             // Update customer email to invalid email address
             exisingCustomer.Email = "testemail";
@@ -377,7 +363,7 @@ namespace GroceryStoreAPI.CustomerTests
             var json = JsonConvert.SerializeObject(exisingCustomer);
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var updateCustomerResponse = await _client.PutAsync(_url + exisingCustomer.Id, payload);
+            var updateCustomerResponse = await _client.PutAsync(_url + customerId, payload);
 
             // Assert
             updateCustomerResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -394,7 +380,7 @@ namespace GroceryStoreAPI.CustomerTests
             getExistingCustomerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var stream = await getExistingCustomerResponse.Content.ReadAsStreamAsync();
-            Customer exisingCustomer = stream.ReadAndDeserializeFromJson<Customer>();
+            var exisingCustomer = stream.ReadAndDeserializeFromJson<CustomerForUpdateDTO>();
 
             // Update customer name to exceed the maximum length of 20 characters
             exisingCustomer.Phone = "2345asd";
@@ -402,7 +388,7 @@ namespace GroceryStoreAPI.CustomerTests
             var json = JsonConvert.SerializeObject(exisingCustomer);
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var updateCustomerResponse = await _client.PutAsync(_url + exisingCustomer.Id, payload);
+            var updateCustomerResponse = await _client.PutAsync(_url + customerId, payload);
 
             // Assert
             updateCustomerResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -419,7 +405,7 @@ namespace GroceryStoreAPI.CustomerTests
             getExistingCustomerResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
             var stream = await getExistingCustomerResponse.Content.ReadAsStreamAsync();
-            Customer exisingCustomer = stream.ReadAndDeserializeFromJson<Customer>();
+            var exisingCustomer = stream.ReadAndDeserializeFromJson<CustomerForUpdateDTO>();
 
             // Update customer name
             exisingCustomer.Name = "Alexa";
@@ -427,7 +413,7 @@ namespace GroceryStoreAPI.CustomerTests
             var json = JsonConvert.SerializeObject(exisingCustomer);
             var payload = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var updateCustomerResponse = await _client.PutAsync(_url + exisingCustomer.Id, payload);
+            var updateCustomerResponse = await _client.PutAsync(_url + customerId, payload);
 
             // Assert
             updateCustomerResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);

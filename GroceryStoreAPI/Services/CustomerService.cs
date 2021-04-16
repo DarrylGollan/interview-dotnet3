@@ -33,7 +33,7 @@ namespace GroceryStoreAPI.Services
                 throw new ArgumentNullException(nameof(customer));
             }
 
-            //customer.CreatedDate = DateTimeOffset.Now;
+            customer.CreatedDate = DateTimeOffset.UtcNow;
 
             await _context.Customers.AddAsync(customer);
             await _context.SaveChangesAsync();
@@ -47,6 +47,8 @@ namespace GroceryStoreAPI.Services
             {
                 throw new ArgumentNullException(nameof(customer));
             }
+
+            customer.UpdatedDate = DateTimeOffset.UtcNow;
 
             _context.Customers.Update(customer);
             await _context.SaveChangesAsync();

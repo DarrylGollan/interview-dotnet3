@@ -1,4 +1,6 @@
-﻿using GroceryStoreAPI.Entities;
+﻿using AutoMapper;
+using GroceryStoreAPI.Entities;
+using GroceryStoreAPI.Models;
 using GroceryStoreAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -10,15 +12,18 @@ namespace GroceryStoreAPI.Controllers
     public class CustomerController : BaseAPIController
     {
         private readonly ICustomerService _customerService;
+        private readonly IMapper _mapper;
 
-        public CustomerController(ICustomerService customerService)
+        public CustomerController(ICustomerService customerService, IMapper mapper)
         {
             _customerService = customerService ??
                 throw new ArgumentNullException(nameof(customerService));
+            _mapper = mapper ??
+                throw new ArgumentNullException(nameof(mapper));
         }
 
         [HttpGet(Name = "GetCustomers")]
-        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
+        public async Task<ActionResult<IEnumerable<CustomerForDisplayDTO>>> GetCustomers()
         {
             try
             {
@@ -29,7 +34,7 @@ namespace GroceryStoreAPI.Controllers
                     return NotFound();
                 }
 
-                return Ok(customers);
+                return Ok(_mapper.Map<IEnumerable<CustomerForDisplayDTO>>(customers));
             }
             catch (Exception ex)
             {
@@ -38,7 +43,7 @@ namespace GroceryStoreAPI.Controllers
         }
 
         [HttpGet("{id:guid}", Name = "GetCustomerById")]
-        public async Task<ActionResult<Customer>> GetCustomerById(Guid id)
+        public async Task<ActionResult<CustomerForDisplayDTO>> GetCustomerById(Guid id)
         {
             if (id == null || id == Guid.Empty)
             {
@@ -54,7 +59,7 @@ namespace GroceryStoreAPI.Controllers
                     return NotFound();
                 }
 
-                return Ok(customer);
+                return Ok(_mapper.Map<CustomerForDisplayDTO>(customer));
             }
             catch (Exception ex)
             {
@@ -64,23 +69,26 @@ namespace GroceryStoreAPI.Controllers
         }
 
         [HttpPost(Name = "CreateCustomer")]
-        public async Task<ActionResult<Customer>> CreateCustomer(Customer customer)
+        public async Task<ActionResult<CustomerForDisplayDTO>> CreateCustomer(CustomerForCreationDTO customerForCreationDTO)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
+                    var customer = _mapper.Map<Customer>(customerForCreationDTO);
+                    
                     if (customer.Id == null || customer.Id == Guid.Empty)
                     {
                         customer.Id = Guid.NewGuid();
                     }
 
+                    //var customer = 
                     var customerId = await _customerService.AddCustomer(customer);
                     if (customerId != Guid.Empty)
                     {
                         return CreatedAtRoute("CreateCustomer",
                             new { Id = customerId },
-                            customer);
+                            _mapper.Map<CustomerForDisplayDTO>(customer));
                     }
                     else
                     {
@@ -98,7 +106,7 @@ namespace GroceryStoreAPI.Controllers
         }
 
         [HttpPut("{customerId:guid}", Name = "UpdateCustomer")]
-        public async Task<IActionResult> UpdateCustomer(Guid customerId, Customer updatedCustomer)
+        public async Task<IActionResult> UpdateCustomer(Guid customerId, CustomerForUpdateDTO customerForUpdateDTO)
         {
             if (ModelState.IsValid)
             {
@@ -109,8 +117,10 @@ namespace GroceryStoreAPI.Controllers
                         return NotFound();
                     }
 
-                    updatedCustomer.Id = customerId;
-                    await _customerService.UpdateCustomer(updatedCustomer);
+                    var customer = _mapper.Map<Customer>(customerForUpdateDTO);
+
+                    customer.Id = customerId;
+                    await _customerService.UpdateCustomer(customer);
 
                     return NoContent();
                 }
